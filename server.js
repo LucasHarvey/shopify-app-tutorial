@@ -36,7 +36,7 @@ app.prepare().then(() => {
       afterAuth(ctx) {
         const { shop, scope } = ctx.state.shopify;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
-        ctx.redirect(`/`);
+        ctx.redirect(`/?shop=${shop}`);
       },
     })
   );
