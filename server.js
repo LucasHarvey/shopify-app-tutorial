@@ -6,6 +6,8 @@ const { default: createShopifyAuth } = require("@shopify/koa-shopify-auth");
 const { verifyRequest } = require("@shopify/koa-shopify-auth");
 const { default: Shopify, ApiVersion } = require("@shopify/shopify-api");
 const Router = require("koa-router");
+const mount = require("koa-mount");
+const serve = require("koa-static");
 
 dotenv.config();
 
@@ -41,6 +43,14 @@ app.prepare().then(() => {
     })
   );
 
+  router.post(
+    "/graphql",
+    verifyRequest({ returnHeader: true }),
+    async (ctx, next) => {
+      await Shopify.Utils.graphqlProxy(ctx.req, ctx.res);
+    }
+  );
+
   const handleRequest = async (ctx) => {
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
@@ -61,6 +71,7 @@ app.prepare().then(() => {
   router.get("/_next/webpack-hmr", handleRequest);
   router.get("(.*)", verifyRequest(), handleRequest);
 
+  server.use(mount("/", serve("./public")));
   server.use(router.allowedMethods());
   server.use(router.routes());
 
