@@ -9,6 +9,7 @@ import translations from "@shopify/polaris/locales/en.json";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
 import ClientRouter from "../components/ClientRouter";
+import { Redirect } from "@shopify/app-bridge/actions";
 
 function userLoggedInFetch(app) {
   const fetchFunction = authenticatedFetch(app);

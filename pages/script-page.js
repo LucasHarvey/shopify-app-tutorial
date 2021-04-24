@@ -1,5 +1,13 @@
 import gql from "graphql-tag";
 import { useQuery, useMutation } from "@apollo/react-hooks";
+import {
+  Button,
+  Card,
+  Layout,
+  Page,
+  ResourceList,
+  Stack,
+} from "@shopify/polaris";
 
 const CREATE_SCRIPT_TAG = gql`
   mutation scriptTagCreate($input: ScriptTagInput!) {
@@ -56,44 +64,72 @@ function ScriptPage() {
   console.log(data);
 
   return (
-    <div>
-      <h1>Hello this is Script Page</h1>
-      <button
-        type="submit"
-        onClick={() => {
-          createScripts({
-            variables: {
-              input: {
-                src: "https://dry-husky-69.loca.lt/test-script.js",
-                displayScope: "ALL",
-              },
-            },
-          });
-        }}
-      >
-        Create Script Tag
-      </button>
-      <button
-        type="submit"
-        onClick={() => {
-          deleteScript({
-            variables: {
-              id: "gid://shopify/ScriptTag/172657377432",
-            },
-          });
-        }}
-      >
-        Delete Script Tag
-      </button>
-
-      {data.scriptTags.edges.map((item) => {
-        return (
-          <div key={item.node.id}>
-            <p>{item.node.id}</p>
-          </div>
-        );
-      })}
-    </div>
+    <Page>
+      <Layout>
+        <Layout.Section>
+          <Card title="Active Script Tags:" sectioned>
+            <p>Create or delete script tag</p>
+          </Card>
+        </Layout.Section>
+        <Layout.Section secondary>
+          <Card title="Create Tag" sectioned>
+            <Button
+              primary
+              size="slim"
+              type="submit"
+              onClick={() => {
+                createScripts({
+                  variables: {
+                    input: {
+                      src: "https://dry-husky-69.loca.lt/test-script.js",
+                      displayScope: "ALL",
+                    },
+                  },
+                  refetchQueries: [{ query: QUERY_SCRIPTTAGS }],
+                });
+              }}
+            >
+              Create Script Tag
+            </Button>
+          </Card>
+        </Layout.Section>
+        <Layout.Section>
+          <Card>
+            <ResourceList
+              showHeader
+              resourceName={{ singular: "Script", plural: "Scripts" }}
+              items={data.scriptTags.edges}
+              renderItem={(item) => {
+                return (
+                  <ResourceList.Item id={item.id}>
+                    <Stack>
+                      <Stack.Item>
+                        <p>{item.node.id}</p>
+                      </Stack.Item>
+                      <Stack.Item>
+                        <Button
+                          type="submit"
+                          onClick={() => {
+                            deleteScript({
+                              variables: {
+                                id: item.node.id,
+                              },
+                              refetchQueries: [{ query: QUERY_SCRIPTTAGS }],
+                            });
+                          }}
+                        >
+                          Delete Script Tag
+                        </Button>
+                      </Stack.Item>
+                    </Stack>
+                  </ResourceList.Item>
+                );
+              }}
+            ></ResourceList>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
   );
 }
 

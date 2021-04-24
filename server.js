@@ -8,6 +8,7 @@ const { default: Shopify, ApiVersion } = require("@shopify/shopify-api");
 const Router = require("koa-router");
 const mount = require("koa-mount");
 const serve = require("koa-static");
+const koaBody = require("koa-body");
 
 dotenv.config();
 
@@ -28,9 +29,40 @@ const handle = app.getRequestHandler();
 
 const ACTIVE_SHOPIFY_SHOPS = {};
 
+const router = new Router();
+const server = new Koa();
+
+// TODO: use MongoDB here
+const products = [
+  {
+    image1: "test",
+  },
+];
+
+router.get("/api/products", async (ctx) => {
+  try {
+    ctx.body = {
+      status: "success",
+      data: products,
+    };
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.post("/api/products", koaBody(), async (ctx) => {
+  try {
+    const body = ctx.request.body;
+    products.push(body);
+    ctx.body = "Item Added";
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 app.prepare().then(() => {
-  const server = new Koa();
-  const router = new Router();
+  //   const router = new Router();
+
   server.keys = [Shopify.Context.API_SECRET_KEY];
 
   server.use(
