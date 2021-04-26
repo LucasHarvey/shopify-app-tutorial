@@ -10,6 +10,7 @@ const mount = require("koa-mount");
 const serve = require("koa-static");
 const koaBody = require("koa-body");
 const { isCompositeType } = require("graphql");
+const getSubscriptionUrl = require("./server/getSubscriptionUrl");
 
 dotenv.config();
 
@@ -77,10 +78,17 @@ app.prepare().then(() => {
 
   server.use(
     createShopifyAuth({
-      afterAuth(ctx) {
-        const { shop, scope } = ctx.state.shopify;
+      async afterAuth(ctx) {
+        const { shop, scope, accessToken } = ctx.state.shopify;
         ACTIVE_SHOPIFY_SHOPS[shop] = scope;
-        ctx.redirect(`/?shop=${shop}`);
+        // ctx.redirect(`/?shop=${shop}`);
+        const returnUrl = `https://${Shopify.Context.HOST_NAME}?shop=${shop}`;
+        const subscriptionUrl = await getSubscriptionUrl(
+          accessToken,
+          shop,
+          returnUrl
+        );
+        ctx.redirect(subscriptionUrl);
       },
     })
   );
