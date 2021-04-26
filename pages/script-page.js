@@ -81,7 +81,7 @@ function ScriptPage() {
                 createScripts({
                   variables: {
                     input: {
-                      src: "https://dry-husky-69.loca.lt/test-script.js",
+                      src: "https://green-otter-14.loca.lt/test-script.js",
                       displayScope: "ALL",
                     },
                   },

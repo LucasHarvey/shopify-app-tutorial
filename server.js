@@ -9,6 +9,7 @@ const Router = require("koa-router");
 const mount = require("koa-mount");
 const serve = require("koa-static");
 const koaBody = require("koa-body");
+const { isCompositeType } = require("graphql");
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ const router = new Router();
 const server = new Koa();
 
 // TODO: use MongoDB here
-const products = [
+var products = [
   {
     image1: "test",
   },
@@ -55,6 +56,15 @@ router.post("/api/products", koaBody(), async (ctx) => {
     const body = ctx.request.body;
     products.push(body);
     ctx.body = "Item Added";
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+router.delete("/api/products", koaBody(), async (ctx) => {
+  try {
+    products = [];
+    ctx.body = "All items deleted";
   } catch (error) {
     console.log(error);
   }

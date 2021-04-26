@@ -4,6 +4,7 @@ import { ResourcePicker } from "@shopify/app-bridge-react";
 import store from "store-js";
 import ResourceListWithProducts from "../components/ResourceList";
 import { TitleBar } from "@shopify/app-bridge-react";
+import axios from "axios";
 
 const img =
   "https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png";
@@ -16,7 +17,26 @@ function Index() {
     setModal({ open: false });
     console.log(idsFromResources);
     store.set("ids", idsFromResources);
+
+    const selectedProducts = resources.selection;
+
+    deleteApiData();
+
+    selectedProducts.map((product) => makeApiCall(product));
   };
+
+  function deleteApiData() {
+    const url = "/api/products";
+    axios.delete(url);
+  }
+
+  async function makeApiCall(product) {
+    const url = "/api/products";
+    axios
+      .post(url, product)
+      .then((result) => console.log(result))
+      .catch((error) => console.log(error));
+  }
 
   return (
     <Page fullWidth>
@@ -24,6 +44,7 @@ function Index() {
         title="Test App"
         primaryAction={{
           content: "Select products",
+          onAction: () => setModal({ open: true }),
         }}
       />
       <ResourcePicker
